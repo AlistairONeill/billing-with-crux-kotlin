@@ -2,6 +2,7 @@ package billing.web
 
 import billing.app.BillingApp
 import billing.domain.StubBillingSource
+import billing.domain.model.BillingItemId
 import billing.domain.model.aBillingItem
 import billing.domain.model.aNewBillingItem
 import billing.domain.model.hasContentsOf
@@ -19,6 +20,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
@@ -118,8 +120,47 @@ class RoutesTest {
             )
 
             assertThat(
+                response,
+                hasStatus(OK)
+            )
+
+            assertThat(
                 response.parseJsonBody(JSet(JBillingItem)),
                 equalTo(billingItems)
+            )
+        }
+    }
+
+    @Nested
+    inner class GetBillingItem {
+        @Test
+        fun `can get a billing item`() {
+            val billingItem = aBillingItem()
+
+            billingSource.put(billingItem)
+
+            val response = client(
+                Request(GET, "$API_BILLING_ITEM/${billingItem.id.value}")
+            )
+
+            assertThat(
+                response,
+                hasStatus(OK)
+            )
+
+            assertThat(
+                response.parseJsonBody(JBillingItem),
+                equalTo(billingItem)
+            )
+        }
+
+        @Test
+        fun `returns 404 if no billing item found`() {
+            assertThat(
+                client(
+                    Request(GET, "$API_BILLING_ITEM/${BillingItemId.mint().value}")
+                ),
+                hasStatus(NOT_FOUND)
             )
         }
     }

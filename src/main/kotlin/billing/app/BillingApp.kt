@@ -18,4 +18,6 @@ class BillingApp(
         ).also(billingSource::put)
 
     fun getAllBillingItems() = billingSource.getAll()
+
+    fun getBillingItem(id: BillingItemId) = billingSource[id]
 }

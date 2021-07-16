@@ -44,6 +44,7 @@ fun billingRoutes(
                 routes += pingRoute()
                 routes += addBillingItemRoute(billingApp)
                 routes += getBillingItemsRoute(billingApp)
+                routes += getBillingItemRoute(billingApp)
             }
         )
     )

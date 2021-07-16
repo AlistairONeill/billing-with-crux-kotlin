@@ -9,15 +9,17 @@ import billing.web.routes.BillingRoutes.API_BILLING_ITEM
 import billing.web.toOkResponse
 import com.ubertob.kondor.json.JSet
 import org.http4k.contract.ContractRoute
+import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.httpBodyLens
+import org.http4k.lens.Path
 
 fun addBillingItemRoute(billingApp: BillingApp): ContractRoute =
     API_BILLING_ITEM meta {
@@ -28,7 +30,6 @@ fun addBillingItemRoute(billingApp: BillingApp): ContractRoute =
         receiving(newBillingItemLens to exampleNewBillingItem)
         returning(OK to "The billing item")
         returning(BAD_REQUEST)
-        returning(INTERNAL_SERVER_ERROR)
     } bindContract POST to { request ->
         request
             .parseJsonBody(JNewBillingItem)
@@ -55,4 +56,21 @@ fun getBillingItemsRoute(billingApp: BillingApp): ContractRoute =
     } bindContract GET to {
         billingApp.getAllBillingItems()
             .toOkResponse(JSet(JBillingItem))
+    }
+
+private val billingItemIdLens = Path.map(::BillingItemId).of("billingItemId")
+
+fun getBillingItemRoute(billingApp: BillingApp): ContractRoute =
+    API_BILLING_ITEM / billingItemIdLens meta {
+        summary = "gets a billing item"
+        description = "gets a billing item"
+        produces += APPLICATION_JSON
+        returning(OK to "The billing item")
+        returning(NOT_FOUND)
+    } bindContract GET to { billingItemId ->
+        {
+            billingApp.getBillingItem(billingItemId)
+                ?.toOkResponse(JBillingItem)
+                ?: Response(NOT_FOUND)
+        }
     }
