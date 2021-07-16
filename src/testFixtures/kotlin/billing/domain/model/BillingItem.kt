@@ -1,6 +1,9 @@
 package billing.domain.model
 
 import billing.util.randomString
+import com.natpryce.hamkrest.MatchResult
+import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.describe
 import java.util.*
 import kotlin.random.Random.Default.nextDouble
 
@@ -29,3 +32,18 @@ fun aNewBillingItem(
     BillingItemTag(tag),
     BillingItemDetails(details)
 )
+
+fun hasContentsOf(expected: NewBillingItem): Matcher<BillingItem> =
+    object : Matcher<BillingItem> {
+        override fun invoke(actual: BillingItem): MatchResult =
+            if (actual.client == expected.client
+                && actual.amount == expected.amount
+                && actual.details == expected.details
+                && actual.tag == expected.tag) {
+                MatchResult.Match
+            } else {
+                MatchResult.Mismatch("was: ${describe(actual)}")
+            }
+        override val description: String get() = "has contents equal to ${describe(expected)}"
+        override val negatedDescription: String get() = "does not have contents equal to ${describe(expected)}"
+    }
