@@ -1,6 +1,7 @@
-package billing.app
+package billing
 
 import billing.adapter.CruxBillingSource
+import billing.app.BillingApp
 import billing.web.routes.billingRoutes
 import crux.api.CruxK
 import org.http4k.server.Netty
