@@ -9,7 +9,7 @@ import java.time.Instant
 fun <T> assertThatEventually(
     probe: () -> T,
     criteria: Matcher<T>,
-    millis: Long = 10000
+    millis: Long = 2000
 ) {
     val start = Instant.now().toEpochMilli()
     fun assert() =
@@ -25,7 +25,7 @@ fun <T> assertThatEventually(
         }
         catch (e: AssertionError) { }
         catch (e: Exception) { }
-        Thread.sleep(100)
+        Thread.sleep(50)
     }
 
     assert()
