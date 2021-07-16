@@ -2,10 +2,7 @@ package billing.web
 
 import billing.app.BillingApp
 import billing.domain.StubBillingSource
-import billing.domain.model.BillingItemId
-import billing.domain.model.aBillingItem
-import billing.domain.model.aNewBillingItem
-import billing.domain.model.hasContentsOf
+import billing.domain.model.*
 import billing.json.JBillingItem
 import billing.json.JNewBillingItem
 import billing.web.routes.BillingRoutes.API_BILLING_ITEM
@@ -20,6 +17,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -95,12 +93,7 @@ class RoutesTest {
 
     @Nested
     inner class GetBillingItems {
-        @Test
-        fun `can get an empty set of billing items`() {
-            val response = client(
-                Request(GET, API_BILLING_ITEM)
-            )
-
+        private fun assertResponse(response: Response, expected: Set<BillingItem>) {
             assertThat(
                 response,
                 hasStatus(OK)
@@ -108,28 +101,112 @@ class RoutesTest {
 
             assertThat(
                 response.parseJsonBody(JSet(JBillingItem)),
-                equalTo(emptySet())
+                equalTo(expected)
             )
         }
 
         @Test
-        fun `can get billing items`() {
-            val billingItems = List(3) { aBillingItem() }.toSet()
-
-            billingItems.forEach(billingSource::put)
-
-            val response = client(
-                Request(GET, API_BILLING_ITEM)
+        fun `can get an empty set of billing items`() =
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                ),
+                emptySet()
             )
 
-            assertThat(
-                response,
-                hasStatus(OK)
-            )
+        @Test
+        fun `can get all billing items`() {
+            val items = List(3) { aBillingItem() }.toSet()
 
-            assertThat(
-                response.parseJsonBody(JSet(JBillingItem)),
-                equalTo(billingItems)
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                ),
+                items
+            )
+        }
+
+        @Test
+        fun `get matching client`() {
+            repeat(5) { billingSource.put(aBillingItem(client = "MrBar")) }
+
+            val items = List(5) { aBillingItem(client = "MrFoo") }.toSet()
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                        .query("client", "MrFoo")
+                ),
+                items
+            )
+        }
+
+        @Test
+        fun `get matching amount`() {
+            repeat(5) { billingSource.put(aBillingItem(amount = -1.0)) }
+
+            val items = List(5) { aBillingItem(amount = 118.0 ) }.toSet()
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                        .query("amount", "118.0")
+                ),
+                items
+            )
+        }
+
+        @Test
+        fun `get matching tag`() {
+            repeat(5) { billingSource.put(aBillingItem(tag = "Import")) }
+
+            val items = List(5) { aBillingItem(tag = "Export") }.toSet()
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                        .query("tag", "Export")
+                ),
+                items
+            )
+        }
+
+        @Test
+        fun `get matching details`() {
+            repeat(5) { billingSource.put(aBillingItem(details = "late")) }
+
+            val items = List(5) { aBillingItem(details = "sent on time") }.toSet()
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                        .query("details", "sent on time")
+                ),
+                items
+            )
+        }
+
+        @Test
+        fun `can match against multiple criteria`() {
+            repeat(5) { billingSource.put(aBillingItem(client = "MrFoo", tag = "Import")) }
+            repeat(5) { billingSource.put(aBillingItem(client = "MrBar", tag = "Export")) }
+
+            val items = List(5) { aBillingItem(client = "MrFoo", tag = "Export") }.toSet()
+            items.forEach(billingSource::put)
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_ITEM)
+                        .query("client", "MrFoo")
+                        .query("tag", "Export")
+                ),
+                items
             )
         }
     }
