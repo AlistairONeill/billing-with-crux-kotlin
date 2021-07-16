@@ -1,6 +1,7 @@
 package billing.app
 
 import billing.domain.StubBillingSource
+import billing.domain.model.BillingItemId
 import billing.domain.model.aNewBillingItem
 import billing.domain.model.hasContentsOf
 import com.natpryce.hamkrest.allOf
@@ -26,6 +27,21 @@ class BillingAppTest {
                     equalTo(billingItem),
                     hasContentsOf(newBillingItem)
                 )
+            )
+        )
+    }
+
+    @Test
+    fun `can update a billing item`() {
+        val newBillingItem = aNewBillingItem()
+        val id = BillingItemId.mint()
+
+        app.update(id, newBillingItem)
+
+        assertThat(
+            billingSource[id],
+            present(
+                hasContentsOf(newBillingItem)
             )
         )
     }

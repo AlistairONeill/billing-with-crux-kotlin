@@ -23,4 +23,13 @@ class BillingApp(
     fun getStats(criteria: BillingItemCriteria) = billingSource.getStats(criteria)
 
     fun getBillingItem(id: BillingItemId) = billingSource[id]
+
+    fun update(id: BillingItemId, newBillingItem: NewBillingItem) =
+        BillingItem(
+            id,
+            newBillingItem.client,
+            newBillingItem.amount,
+            newBillingItem.tag,
+            newBillingItem.details
+        ).also(billingSource::put)
 }
