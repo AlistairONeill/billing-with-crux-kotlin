@@ -4,6 +4,7 @@ import billing.app.BillingApp
 import billing.domain.model.*
 import billing.json.JBillingItem
 import billing.json.JNewBillingItem
+import billing.web.lens.*
 import billing.web.parseJsonBody
 import billing.web.routes.BillingRoutes.API_BILLING_ITEM
 import billing.web.toOkResponse
@@ -48,11 +49,6 @@ private val exampleNewBillingItem =
 
 private val newBillingItemLens = httpBodyLens("The Billing Item to add", contentType = APPLICATION_JSON).toLens()
 
-private val clientLens = Query.map(::Client).optional("client")
-private val amountLens = Query.map { it.toDouble().let(::BillingAmount) }.optional("amount")
-private val tagLens = Query.map(::BillingItemTag).optional("tag")
-private val detailsLens = Query.map(::BillingItemDetails).optional("details")
-
 fun getBillingItemsRoute(billingApp: BillingApp): ContractRoute =
     API_BILLING_ITEM meta {
         summary = "gets all billing items"
@@ -64,13 +60,7 @@ fun getBillingItemsRoute(billingApp: BillingApp): ContractRoute =
         queries += detailsLens
         returning(OK to "The billing items")
     } bindContract GET to { request ->
-
-        BillingItemCriteria(
-            client = clientLens(request),
-            amount = amountLens(request),
-            tag = tagLens(request),
-            details = detailsLens(request)
-        )
+        billingItemCriteria(request)
             .let(billingApp::getMatching)
             .toOkResponse(JSet(JBillingItem))
     }
