@@ -3,6 +3,7 @@ package billing.adapter
 import billing.adapter.CruxBillingItem.TYPE_BILLING_ITEM
 import billing.domain.BillingSource
 import billing.domain.model.BillingItem
+import billing.domain.model.BillingItemId
 import clojure.lang.IPersistentMap
 import crux.api.CruxDocument
 import crux.api.ICruxAPI
@@ -24,6 +25,11 @@ class CruxBillingSource(private val crux: ICruxAPI): BillingSource {
             put(item.toCruxDocument())
         }
     }
+
+    override fun get(id: BillingItemId): BillingItem? =
+        crux.db()
+            .entity(id.value)
+            ?.toBillingItem()
 
     override fun getAll(): Set<BillingItem> =
         crux.db().q {

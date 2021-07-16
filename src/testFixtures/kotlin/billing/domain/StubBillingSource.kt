@@ -1,13 +1,16 @@
 package billing.domain
 
 import billing.domain.model.BillingItem
+import billing.domain.model.BillingItemId
 
 class StubBillingSource: BillingSource {
-    private val items = mutableSetOf<BillingItem>()
+    private val items = mutableMapOf<BillingItemId, BillingItem>()
 
     override fun put(item: BillingItem) {
-        items.add(item)
+        items[item.id] = item
     }
 
-    override fun getAll(): Set<BillingItem> = items
+    override fun get(id: BillingItemId) = items[id]
+
+    override fun getAll(): Set<BillingItem> = items.values.toSet()
 }
