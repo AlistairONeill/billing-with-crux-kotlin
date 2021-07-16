@@ -6,6 +6,7 @@ import billing.domain.model.hasContentsOf
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.junit.jupiter.api.Test
 
 class BillingAppTest {
@@ -19,10 +20,12 @@ class BillingAppTest {
         val billingItem = app.add(newBillingItem)
 
         assertThat(
-            billingSource.getAll().single { it.id == billingItem.id },
-            allOf(
-                equalTo(billingItem),
-                hasContentsOf(newBillingItem)
+            billingSource[billingItem.id],
+            present(
+                allOf(
+                    equalTo(billingItem),
+                    hasContentsOf(newBillingItem)
+                )
             )
         )
     }

@@ -2,6 +2,7 @@ package billing.app
 
 import billing.domain.BillingSource
 import billing.domain.model.BillingItem
+import billing.domain.model.BillingItemCriteria
 import billing.domain.model.BillingItemId
 import billing.domain.model.NewBillingItem
 
@@ -17,7 +18,7 @@ class BillingApp(
             newBillingItem.details
         ).also(billingSource::put)
 
-    fun getAllBillingItems() = billingSource.getAll()
+    fun getMatching(criteria: BillingItemCriteria) = billingSource.getMatching(criteria)
 
     fun getBillingItem(id: BillingItemId) = billingSource[id]
 }

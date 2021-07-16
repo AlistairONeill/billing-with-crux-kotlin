@@ -14,6 +14,7 @@ import billing.web.routes.billingRoutes
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import com.ubertob.kondor.json.JSet
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -70,10 +71,12 @@ class RoutesTest {
             val billingItem = response.parseJsonBody(JBillingItem)
 
             assertThat(
-                billingSource.getAll().single { it.id == billingItem.id },
-                allOf(
-                    equalTo(billingItem),
-                    hasContentsOf(newBillingItem)
+                billingSource[billingItem.id],
+                present(
+                    allOf(
+                        equalTo(billingItem),
+                        hasContentsOf(newBillingItem)
+                    )
                 )
             )
         }

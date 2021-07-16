@@ -1,6 +1,7 @@
 package billing.domain
 
 import billing.domain.model.BillingItem
+import billing.domain.model.BillingItemCriteria
 import billing.domain.model.BillingItemId
 
 class StubBillingSource: BillingSource {
@@ -12,5 +13,8 @@ class StubBillingSource: BillingSource {
 
     override fun get(id: BillingItemId) = items[id]
 
-    override fun getAll(): Set<BillingItem> = items.values.toSet()
+    override fun getMatching(criteria: BillingItemCriteria): Set<BillingItem> =
+        items.values
+            .filter(criteria::matches)
+            .toSet()
 }

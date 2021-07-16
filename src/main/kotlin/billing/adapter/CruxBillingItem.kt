@@ -8,6 +8,7 @@ import billing.adapter.CruxBillingItem.TYPE_BILLING_ITEM
 import billing.adapter.CruxBillingSource.Companion.TYPE_KEY
 import billing.domain.model.*
 import crux.api.CruxDocument
+import crux.api.underware.kw
 
 object CruxBillingItem {
     const val TYPE_BILLING_ITEM = "billingItem"
@@ -16,6 +17,11 @@ object CruxBillingItem {
     const val AMOUNT_KEY = "amount"
     const val TAG_KEY = "tag"
     const val DETAILS_KEY = "details"
+
+    val client = CLIENT_KEY.kw
+    val amount = AMOUNT_KEY.kw
+    val tag = TAG_KEY.kw
+    val details = DETAILS_KEY.kw
 }
 
 fun BillingItem.toCruxDocument(): CruxDocument =

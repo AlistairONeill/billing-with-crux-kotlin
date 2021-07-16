@@ -54,7 +54,8 @@ fun getBillingItemsRoute(billingApp: BillingApp): ContractRoute =
         produces += APPLICATION_JSON
         returning(OK to "The billing items")
     } bindContract GET to {
-        billingApp.getAllBillingItems()
+        val criteria = BillingItemCriteria() //TODO: GET FROM REQUEST
+        billingApp.getMatching(criteria)
             .toOkResponse(JSet(JBillingItem))
     }
 
