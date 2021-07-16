@@ -11,9 +11,9 @@ fun aBillingItem(
     tag: String = randomString(),
     details: String = randomString()
 ) = BillingItem(
-    id,
-    client,
-    amount,
-    tag,
-    details
+    BillingItemId(id),
+    Client(client),
+    BillingAmount(amount),
+    BillingItemTag(tag),
+    BillingItemDetails(details)
 )

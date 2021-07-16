@@ -6,11 +6,8 @@ import billing.adapter.CruxBillingItem.DETAILS_KEY
 import billing.adapter.CruxBillingItem.TAG_KEY
 import billing.adapter.CruxBillingItem.TYPE_BILLING_ITEM
 import billing.adapter.CruxBillingSource.Companion.TYPE_KEY
-import billing.domain.model.BillingItem
+import billing.domain.model.*
 import crux.api.CruxDocument
-import crux.api.query.context.PullSpecContext
-import crux.api.query.domain.PullSpec
-import crux.api.underware.kw
 
 object CruxBillingItem {
     const val TYPE_BILLING_ITEM = "billingItem"
@@ -22,19 +19,19 @@ object CruxBillingItem {
 }
 
 fun BillingItem.toCruxDocument(): CruxDocument =
-    CruxDocument.build(id) { document ->
+    CruxDocument.build(id.value) { document ->
         document.put(TYPE_KEY, TYPE_BILLING_ITEM)
-        document.put(CLIENT_KEY, client)
-        document.put(AMOUNT_KEY, amount)
-        document.put(TAG_KEY, tag)
-        document.put(DETAILS_KEY, details)
+        document.put(CLIENT_KEY, client.value)
+        document.put(AMOUNT_KEY, amount.value)
+        document.put(TAG_KEY, tag.value)
+        document.put(DETAILS_KEY, details.value)
     }
 
 fun CruxDocument.toBillingItem() =
     BillingItem(
-        id = id as String,
-        client = get(CLIENT_KEY) as String,
-        amount = get(AMOUNT_KEY) as Double,
-        tag = get(TAG_KEY) as String,
-        details = get(DETAILS_KEY) as String,
+        id = BillingItemId(id as String),
+        client = Client(get(CLIENT_KEY) as String),
+        amount = BillingAmount(get(AMOUNT_KEY) as Double),
+        tag = BillingItemTag(get(TAG_KEY) as String),
+        details = BillingItemDetails(get(DETAILS_KEY) as String),
     )
