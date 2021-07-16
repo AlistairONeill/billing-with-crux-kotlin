@@ -1,7 +1,7 @@
 package billing.domain
 
 import billing.domain.model.aBillingItem
-import com.natpryce.hamkrest.assertion.assertThat
+import billing.util.assertThatEventually
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 
@@ -14,8 +14,8 @@ abstract class AbstractBillingSourceTest {
 
         billingSource.put(item)
 
-        assertThat(
-            billingSource.getAll(),
+        assertThatEventually(
+            { billingSource.getAll() },
             equalTo(setOf(item))
         )
     }
@@ -26,8 +26,8 @@ abstract class AbstractBillingSourceTest {
 
         items.forEach(billingSource::put)
 
-        assertThat(
-            billingSource.getAll(),
+        assertThatEventually(
+            { billingSource.getAll() },
             equalTo(items)
         )
     }

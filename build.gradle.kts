@@ -33,6 +33,7 @@ dependencies {
     testImplementation("org.http4k", "http4k-testing-hamkrest", "4.9.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
 
+    testFixturesImplementation("pro.juxt.crux", "crux-kotlin-dsl", "0.0.4")
     testFixturesImplementation("com.ubertob.kondor", "kondor-core", "1.6.1")
     testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testFixturesImplementation("com.natpryce:hamkrest:1.8.0.1")

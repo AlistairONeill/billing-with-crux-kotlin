@@ -7,6 +7,7 @@ import com.ubertob.kondor.json.str
 import billing.domain.model.BillingItem
 
 object JBillingItem: JAny<BillingItem>() {
+    private val id by str(BillingItem::id)
     private val client by str(BillingItem::client)
     private val amount by num(BillingItem::amount)
     private val tag by str(BillingItem::tag)
@@ -14,6 +15,7 @@ object JBillingItem: JAny<BillingItem>() {
 
     override fun JsonNodeObject.deserializeOrThrow() =
         BillingItem(
+            +id,
             +client,
             +amount,
             +tag,
