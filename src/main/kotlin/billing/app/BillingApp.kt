@@ -20,5 +20,7 @@ class BillingApp(
 
     fun getMatching(criteria: BillingItemCriteria) = billingSource.getMatching(criteria)
 
+    fun getStats(criteria: BillingItemCriteria) = billingSource.getStats(criteria)
+
     fun getBillingItem(id: BillingItemId) = billingSource[id]
 }

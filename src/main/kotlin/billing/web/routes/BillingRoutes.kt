@@ -22,6 +22,7 @@ object BillingRoutes {
     const val PING = "/ping"
 
     const val API_BILLING_ITEM = "/api/billing/item"
+    const val API_BILLING_STATS = "/api/billing/stats"
 }
 
 fun billingRoutes(
@@ -45,6 +46,7 @@ fun billingRoutes(
                 routes += addBillingItemRoute(billingApp)
                 routes += getBillingItemsRoute(billingApp)
                 routes += getBillingItemRoute(billingApp)
+                routes += getBillingStatsRoute(billingApp)
             }
         )
     )

@@ -4,8 +4,10 @@ import billing.app.BillingApp
 import billing.domain.StubBillingSource
 import billing.domain.model.*
 import billing.json.JBillingItem
+import billing.json.JBillingStats
 import billing.json.JNewBillingItem
 import billing.web.routes.BillingRoutes.API_BILLING_ITEM
+import billing.web.routes.BillingRoutes.API_BILLING_STATS
 import billing.web.routes.BillingRoutes.PING
 import billing.web.routes.billingRoutes
 import com.natpryce.hamkrest.allOf
@@ -207,6 +209,37 @@ class RoutesTest {
                         .query("tag", "Export")
                 ),
                 items
+            )
+        }
+    }
+
+    @Nested
+    inner class GetStats {
+        private fun assertResponse(response: Response, expected: BillingStats) {
+            assertThat(
+                response,
+                hasStatus(OK)
+            )
+
+            assertThat(
+                response.parseJsonBody(JBillingStats),
+                equalTo(expected)
+            )
+        }
+
+        @Test
+        fun `can get stats`() {
+            repeat(5) { billingSource.put(aBillingItem(amount = it.toDouble())) }
+
+            assertResponse(
+                client(
+                    Request(GET, API_BILLING_STATS)
+                ),
+                BillingStats(
+                    5,
+                    BillingAmount(10.0),
+                    BillingAmount(2.0)
+                )
             )
         }
     }
