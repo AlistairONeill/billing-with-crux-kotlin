@@ -10,6 +10,13 @@ data class BillingItem(
     val details: BillingItemDetails
 )
 
+data class NewBillingItem(
+    val client: Client,
+    val amount: BillingAmount,
+    val tag: BillingItemTag,
+    val details: BillingItemDetails
+)
+
 data class BillingItemId(override val value: String): TinyType<String>
 data class Client(override val value: String): TinyType<String>
 data class BillingAmount(override val value: Double): TinyType<Double>

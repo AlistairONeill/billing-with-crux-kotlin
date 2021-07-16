@@ -17,3 +17,15 @@ fun aBillingItem(
     BillingItemTag(tag),
     BillingItemDetails(details)
 )
+
+fun aNewBillingItem(
+    client: String = randomString(),
+    amount: Double = nextDouble(),
+    tag: String = randomString(),
+    details: String = randomString()
+) = NewBillingItem(
+    Client(client),
+    BillingAmount(amount),
+    BillingItemTag(tag),
+    BillingItemDetails(details)
+)

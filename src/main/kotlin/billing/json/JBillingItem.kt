@@ -20,3 +20,18 @@ object JBillingItem: JAny<BillingItem>() {
             BillingItemDetails(+details)
         )
 }
+
+object JNewBillingItem: JAny<NewBillingItem>() {
+    private val client by str(NewBillingItem::client)
+    private val amount by num(NewBillingItem::amount)
+    private val tag by str(NewBillingItem::tag)
+    private val details by str(NewBillingItem::details)
+
+    override fun JsonNodeObject.deserializeOrThrow() =
+        NewBillingItem(
+            Client(+client),
+            BillingAmount(+amount),
+            BillingItemTag(+tag),
+            BillingItemDetails(+details)
+        )
+}
