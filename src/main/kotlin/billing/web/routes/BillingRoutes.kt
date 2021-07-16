@@ -1,6 +1,6 @@
 package billing.web.routes
 
-import billing.domain.BillingSource
+import billing.app.BillingApp
 import billing.web.routes.BillingRoutes.API_DESCRIPTION_PATH
 import org.http4k.contract.contract
 import org.http4k.contract.openapi.ApiInfo
@@ -20,7 +20,7 @@ object BillingRoutes {
 }
 
 fun billingRoutes(
-    billingSource: BillingSource
+    billingApp: BillingApp
 ) = routes(
     "docs" bind GET to { Response(FOUND).header("Location", "/docs/index.html?url=$API_DESCRIPTION_PATH") },
     "/docs" bind static(Classpath("META-INF/resources/webjars/swagger-ui/3.25.2")),

@@ -1,5 +1,6 @@
 package billing.web
 
+import billing.app.BillingApp
 import billing.domain.StubBillingSource
 import billing.web.routes.BillingRoutes.PING
 import billing.web.routes.billingRoutes
@@ -17,9 +18,10 @@ import org.junit.jupiter.api.Test
 class RoutesTest {
     private val billingSource = StubBillingSource()
 
-    private val client: HttpHandler = billingRoutes(
+    private val client: HttpHandler =
         billingSource
-    )
+            .let(::BillingApp)
+            .let(::billingRoutes)
 
     @Nested
     inner class Ping {
