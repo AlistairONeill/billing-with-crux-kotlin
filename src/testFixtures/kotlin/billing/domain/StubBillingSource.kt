@@ -1,8 +1,7 @@
 package billing.domain
 
-import billing.domain.model.BillingItem
-import billing.domain.model.BillingItemCriteria
-import billing.domain.model.BillingItemId
+import billing.domain.model.*
+import billing.domain.model.BillingStats.Companion.Empty
 
 class StubBillingSource: BillingSource {
     private val items = mutableMapOf<BillingItemId, BillingItem>()
@@ -17,4 +16,21 @@ class StubBillingSource: BillingSource {
         items.values
             .filter(criteria::matches)
             .toSet()
+
+    override fun getStats(criteria: BillingItemCriteria): BillingStats {
+        val matching = getMatching(criteria)
+        if (matching.isEmpty()) {
+            return Empty
+        }
+
+        val itemCount = matching.size.toLong()
+        val total = matching.sumOf { it.amount.value }
+        val mean = total / itemCount
+
+        return BillingStats(
+            itemCount,
+            BillingAmount(total),
+            BillingAmount(mean)
+        )
+    }
 }

@@ -151,6 +151,53 @@ abstract class AbstractBillingSourceTest {
     }
 
     @Nested
+    inner class Statistics {
+        @Test
+        fun `doesn't fall over when empty`() {
+            assertThat(
+                billingSource.getStats(BillingItemCriteria()),
+                equalTo(
+                    BillingStats(
+                        0,
+                        BillingAmount(0.0),
+                        BillingAmount(0.0)
+                    )
+                )
+            )
+        }
+
+        @Test
+        fun `correctly counts number of entries`() {
+            repeat(5) { billingSource.put(aBillingItem()) }
+
+            assertThatEventually(
+                { billingSource.getStats(BillingItemCriteria()) },
+                hasItemCount(5)
+            )
+        }
+
+        @Test
+        fun `correctly calculates total`() {
+            repeat(5) { billingSource.put(aBillingItem(amount = it.toDouble())) }
+
+            assertThatEventually(
+                { billingSource.getStats(BillingItemCriteria()) },
+                hasTotal(BillingAmount(10.0))
+            )
+        }
+
+        @Test
+        fun `correctly calculates mean`() {
+            repeat(5) { billingSource.put(aBillingItem(amount = it.toDouble())) }
+
+            assertThatEventually(
+                { billingSource.getStats(BillingItemCriteria()) },
+                hasMean(BillingAmount(2.0))
+            )
+        }
+    }
+
+    @Nested
     inner class GetById {
         @Test
         fun `can get billing item by id`() {

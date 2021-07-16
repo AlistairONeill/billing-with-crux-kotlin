@@ -6,9 +6,7 @@ import billing.adapter.CruxBillingItem.client
 import billing.adapter.CruxBillingItem.details
 import billing.adapter.CruxBillingItem.tag
 import billing.domain.BillingSource
-import billing.domain.model.BillingItem
-import billing.domain.model.BillingItemCriteria
-import billing.domain.model.BillingItemId
+import billing.domain.model.*
 import clojure.lang.IPersistentMap
 import clojure.lang.Symbol
 import crux.api.CruxDocument
@@ -24,6 +22,7 @@ class CruxBillingSource(private val crux: ICruxAPI): BillingSource {
         const val TYPE_KEY = "type"
 
         private val item = "item".sym
+        private val itemAmount = "amount".sym
         private val type = TYPE_KEY.kw
     }
 
@@ -53,6 +52,30 @@ class CruxBillingSource(private val crux: ICruxAPI): BillingSource {
             val map = it.single() as IPersistentMap
             map.let(CruxDocument::factory).toBillingItem()
         }.toSet()
+
+    override fun getStats(criteria: BillingItemCriteria): BillingStats =
+        crux.db().q {
+            find {
+                count(item)
+                sum(itemAmount)
+                avg(itemAmount)
+            }
+
+            where {
+                item has type eq TYPE_BILLING_ITEM
+                item has amount eq itemAmount
+
+                applyCriteriaFilter(item, criteria)
+            }
+        }.map {
+            BillingStats(
+                it[0] as Long,
+                BillingAmount(it[1] as Double),
+                BillingAmount(it[2] as Double)
+            )
+        }
+            .singleOrNull()
+            ?: BillingStats.Empty
 
     private fun WhereContext.applyCriteriaFilter(item: Symbol, criteria: BillingItemCriteria) {
         criteria.amount?.let { item has amount eq it.value }
