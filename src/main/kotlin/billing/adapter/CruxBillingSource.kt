@@ -77,6 +77,12 @@ class CruxBillingSource(private val crux: ICruxAPI): BillingSource {
             .singleOrNull()
             ?: BillingStats.Empty
 
+    override fun delete(id: BillingItemId) {
+        crux.submitTx {
+            delete(id.value)
+        }
+    }
+
     private fun WhereContext.applyCriteriaFilter(item: Symbol, criteria: BillingItemCriteria) {
         criteria.amount?.let { item has amount eq it.value }
         criteria.client?.let { item has client eq it.value }

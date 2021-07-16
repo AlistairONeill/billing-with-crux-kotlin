@@ -33,4 +33,8 @@ class StubBillingSource: BillingSource {
             BillingAmount(mean)
         )
     }
+
+    override fun delete(id: BillingItemId) {
+        items.remove(id)
+    }
 }

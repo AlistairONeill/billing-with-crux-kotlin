@@ -9,5 +9,6 @@ interface BillingSource {
     fun put(item: BillingItem)
     fun getMatching(criteria: BillingItemCriteria): Set<BillingItem>
     fun getStats(criteria: BillingItemCriteria): BillingStats
+    fun delete(id: BillingItemId)
     operator fun get(id: BillingItemId): BillingItem?
 }

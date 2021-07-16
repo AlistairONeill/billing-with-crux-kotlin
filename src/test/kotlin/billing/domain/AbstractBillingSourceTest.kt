@@ -198,6 +198,29 @@ abstract class AbstractBillingSourceTest {
     }
 
     @Nested
+    inner class Delete {
+        @Test
+        fun `can delete billing item by id`() {
+            val item = aBillingItem()
+
+            billingSource.put(item)
+
+            //Check that the put has definitely been processed!
+            assertThatEventually(
+                { billingSource[item.id] },
+                present(equalTo(item))
+            )
+
+            billingSource.delete(item.id)
+
+            assertThatEventually(
+                { billingSource[item.id] },
+                equalTo(null)
+            )
+        }
+    }
+
+    @Nested
     inner class GetById {
         @Test
         fun `can get billing item by id`() {
