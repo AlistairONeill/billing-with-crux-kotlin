@@ -17,8 +17,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.ubertob.kondor.json.JSet
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -197,6 +196,44 @@ class RoutesTest {
                     .query("client", "MrFoo")
                     .query("tag", "Export"),
                 equalTo(items)
+            )
+        }
+    }
+
+    @Nested
+    inner class PutBillingItem {
+        @Test
+        fun `can put billing item`() {
+            val newBillingItem = aNewBillingItem()
+            val id = BillingItemId.mint()
+
+            val response = client(
+                Request(PUT, "$API_BILLING_ITEM/${id.value}")
+                    .bodyAsJson(JNewBillingItem, newBillingItem)
+            )
+
+            assertThat(
+                response,
+                hasStatus(OK)
+            )
+
+            val billingItem = response.parseJsonBody(JBillingItem)
+
+            assertThat(
+                billingItem,
+                allOf(
+                    hasId(id),
+                    hasContentsOf(newBillingItem)
+                )
+            )
+
+            assertThat(
+                billingSource[id],
+                present(
+                    equalTo(
+                        billingItem
+                    )
+                )
             )
         }
     }

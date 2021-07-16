@@ -4,6 +4,7 @@ import billing.domain.StubBillingSource
 import billing.domain.model.BillingItemId
 import billing.domain.model.aNewBillingItem
 import billing.domain.model.hasContentsOf
+import billing.domain.model.hasId
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -41,7 +42,10 @@ class BillingAppTest {
         assertThat(
             billingSource[id],
             present(
-                hasContentsOf(newBillingItem)
+                allOf(
+                    hasId(id),
+                    hasContentsOf(newBillingItem)
+                )
             )
         )
     }

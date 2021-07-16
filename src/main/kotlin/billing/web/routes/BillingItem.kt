@@ -13,15 +13,13 @@ import org.http4k.contract.ContractRoute
 import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
+import org.http4k.core.Method.*
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.httpBodyLens
 import org.http4k.lens.Path
-import org.http4k.lens.Query
 
 fun addBillingItemRoute(billingApp: BillingApp): ContractRoute =
     API_BILLING_ITEM meta {
@@ -79,5 +77,21 @@ fun getBillingItemRoute(billingApp: BillingApp): ContractRoute =
             billingApp.getBillingItem(billingItemId)
                 ?.toOkResponse(JBillingItem)
                 ?: Response(NOT_FOUND)
+        }
+    }
+
+fun putBillingItemRoute(billingApp: BillingApp): ContractRoute =
+    API_BILLING_ITEM / billingItemIdLens meta {
+        summary = "updates a billing item"
+        description = "updates a billing item"
+        produces += APPLICATION_JSON
+        receiving(newBillingItemLens to exampleNewBillingItem)
+        returning(OK to "The new billing item")
+        returning(BAD_REQUEST)
+    } bindContract PUT to { billingItemId ->
+        { request ->
+            request.parseJsonBody(JNewBillingItem)
+                .let { billingApp.update(billingItemId, it) }
+                .toOkResponse(JBillingItem)
         }
     }

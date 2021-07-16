@@ -33,6 +33,18 @@ fun aNewBillingItem(
     BillingItemDetails(details)
 )
 
+fun hasId(expected: BillingItemId): Matcher<BillingItem> =
+    object : Matcher<BillingItem> {
+        override fun invoke(actual: BillingItem): MatchResult =
+            if (actual.id == expected) {
+                MatchResult.Match
+            } else {
+                MatchResult.Mismatch("was: ${describe(actual)}")
+            }
+        override val description: String get() = "has id equal to ${describe(expected)}"
+        override val negatedDescription: String get() = "does not have id equal to ${describe(expected)}"
+    }
+
 fun hasContentsOf(expected: NewBillingItem): Matcher<BillingItem> =
     object : Matcher<BillingItem> {
         override fun invoke(actual: BillingItem): MatchResult =
