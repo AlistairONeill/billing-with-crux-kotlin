@@ -10,6 +10,7 @@ import billing.web.routes.BillingRoutes.API_BILLING_ITEM
 import billing.web.routes.BillingRoutes.API_BILLING_STATS
 import billing.web.routes.BillingRoutes.PING
 import billing.web.routes.billingRoutes
+import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -19,7 +20,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -95,7 +95,9 @@ class RoutesTest {
 
     @Nested
     inner class GetBillingItems {
-        private fun assertResponse(response: Response, expected: Set<BillingItem>) {
+        private fun assertResponse(request: Request, matcher: Matcher<Set<BillingItem>>) {
+            val response = client(request)
+
             assertThat(
                 response,
                 hasStatus(OK)
@@ -103,17 +105,15 @@ class RoutesTest {
 
             assertThat(
                 response.parseJsonBody(JSet(JBillingItem)),
-                equalTo(expected)
+                matcher
             )
         }
 
         @Test
         fun `can get an empty set of billing items`() =
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                ),
-                emptySet()
+                Request(GET, API_BILLING_ITEM),
+                equalTo(emptySet())
             )
 
         @Test
@@ -123,10 +123,8 @@ class RoutesTest {
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                ),
-                items
+                Request(GET, API_BILLING_ITEM),
+                equalTo(items)
             )
         }
 
@@ -138,11 +136,9 @@ class RoutesTest {
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                        .query("client", "MrFoo")
-                ),
-                items
+                Request(GET, API_BILLING_ITEM)
+                    .query("client", "MrFoo"),
+                equalTo(items)
             )
         }
 
@@ -150,15 +146,13 @@ class RoutesTest {
         fun `get matching amount`() {
             repeat(5) { billingSource.put(aBillingItem(amount = -1.0)) }
 
-            val items = List(5) { aBillingItem(amount = 118.0 ) }.toSet()
+            val items = List(5) { aBillingItem(amount = 118.0) }.toSet()
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                        .query("amount", "118.0")
-                ),
-                items
+                Request(GET, API_BILLING_ITEM)
+                    .query("amount", "118.0"),
+                equalTo(items)
             )
         }
 
@@ -170,11 +164,9 @@ class RoutesTest {
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                        .query("tag", "Export")
-                ),
-                items
+                Request(GET, API_BILLING_ITEM)
+                    .query("tag", "Export"),
+                equalTo(items)
             )
         }
 
@@ -186,11 +178,9 @@ class RoutesTest {
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                        .query("details", "sent on time")
-                ),
-                items
+                Request(GET, API_BILLING_ITEM)
+                    .query("details", "sent on time"),
+                equalTo(items)
             )
         }
 
@@ -203,19 +193,19 @@ class RoutesTest {
             items.forEach(billingSource::put)
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_ITEM)
-                        .query("client", "MrFoo")
-                        .query("tag", "Export")
-                ),
-                items
+                Request(GET, API_BILLING_ITEM)
+                    .query("client", "MrFoo")
+                    .query("tag", "Export"),
+                equalTo(items)
             )
         }
     }
 
     @Nested
     inner class GetStats {
-        private fun assertResponse(response: Response, expected: BillingStats) {
+        private fun assertResponse(request: Request, matcher: Matcher<BillingStats>) {
+            val response = client(request)
+
             assertThat(
                 response,
                 hasStatus(OK)
@@ -223,7 +213,7 @@ class RoutesTest {
 
             assertThat(
                 response.parseJsonBody(JBillingStats),
-                equalTo(expected)
+                matcher
             )
         }
 
@@ -232,13 +222,11 @@ class RoutesTest {
             repeat(5) { billingSource.put(aBillingItem(amount = it.toDouble())) }
 
             assertResponse(
-                client(
-                    Request(GET, API_BILLING_STATS)
-                ),
-                BillingStats(
-                    5,
-                    BillingAmount(10.0),
-                    BillingAmount(2.0)
+                Request(GET, API_BILLING_STATS),
+                allOf(
+                    hasItemCount(5),
+                    hasTotal(10.0),
+                    hasMean(2.0)
                 )
             )
         }

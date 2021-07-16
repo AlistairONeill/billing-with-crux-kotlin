@@ -182,7 +182,7 @@ abstract class AbstractBillingSourceTest {
 
             assertThatEventually(
                 { billingSource.getStats(BillingItemCriteria()) },
-                hasTotal(BillingAmount(10.0))
+                hasTotal(10.0)
             )
         }
 
@@ -192,7 +192,7 @@ abstract class AbstractBillingSourceTest {
 
             assertThatEventually(
                 { billingSource.getStats(BillingItemCriteria()) },
-                hasMean(BillingAmount(2.0))
+                hasMean(2.0)
             )
         }
     }

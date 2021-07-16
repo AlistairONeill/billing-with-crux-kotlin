@@ -17,8 +17,8 @@ fun aBillingStats(
 )
 
 fun hasItemCount(expected: Long) = matcher(BillingStats::itemCount, expected, "itemCount")
-fun hasTotal(expected: BillingAmount) = matcher(BillingStats::total, expected, "total")
-fun hasMean(expected: BillingAmount) = matcher(BillingStats::mean, expected, "mean")
+fun hasTotal(expected: Double) = matcher(BillingStats::total, BillingAmount(expected), "total")
+fun hasMean(expected: Double) = matcher(BillingStats::mean, BillingAmount(expected), "mean")
 
 private fun <T> matcher(probe: (BillingStats) -> T, expected: T, propertyName: String) = object : Matcher<BillingStats> {
     override val description = "has $propertyName of $expected"
