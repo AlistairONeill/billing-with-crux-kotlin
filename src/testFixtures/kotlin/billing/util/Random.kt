@@ -1,10 +1,12 @@
+@file:Suppress("SpellCheckingInspection")
+
 package billing.util
 
-private val lowerCase = "abcdefghijklmnopqrstuvwxyz"
-private val upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-private val alphabet = lowerCase + upperCase
-private val numbers = "0123456789"
-private val alphaNumeric = alphabet + numbers
+private const val lowerCase = "abcdefghijklmnopqrstuvwxyz"
+private const val upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+private const val alphabet = lowerCase + upperCase
+private const val numbers = "0123456789"
+private const val alphaNumeric = alphabet + numbers
 
 fun randomString(
     charset: String = alphaNumeric,
