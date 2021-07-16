@@ -15,6 +15,7 @@ import org.http4k.contract.meta
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.*
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -93,5 +94,17 @@ fun putBillingItemRoute(billingApp: BillingApp): ContractRoute =
             request.parseJsonBody(JNewBillingItem)
                 .let { billingApp.update(billingItemId, it) }
                 .toOkResponse(JBillingItem)
+        }
+    }
+
+fun deleteBillingItemRoute(billingApp: BillingApp): ContractRoute =
+    API_BILLING_ITEM / billingItemIdLens meta {
+        summary = "deletes a billing item"
+        description = "deletes a billing item"
+        returning(OK)
+    } bindContract DELETE to { billingItemId ->
+        {
+            billingApp.delete(billingItemId)
+            Response(OK)
         }
     }

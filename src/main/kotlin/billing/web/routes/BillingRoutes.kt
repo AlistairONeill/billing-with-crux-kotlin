@@ -48,6 +48,7 @@ fun billingRoutes(
                 routes += getBillingItemRoute(billingApp)
                 routes += getBillingStatsRoute(billingApp)
                 routes += putBillingItemRoute(billingApp)
+                routes += deleteBillingItemRoute(billingApp)
             }
         )
     )

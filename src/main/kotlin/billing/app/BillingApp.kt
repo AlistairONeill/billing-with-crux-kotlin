@@ -32,4 +32,6 @@ class BillingApp(
             newBillingItem.tag,
             newBillingItem.details
         ).also(billingSource::put)
+
+    fun delete(id: BillingItemId) = billingSource.delete(id)
 }

@@ -239,6 +239,26 @@ class RoutesTest {
     }
 
     @Nested
+    inner class Delete {
+        @Test
+        fun `can delete by id`() {
+            val item = aBillingItem().also(billingSource::put)
+
+            assertThat(
+                client(
+                    Request(DELETE, "$API_BILLING_ITEM/${item.id.value}")
+                ),
+                hasStatus(OK)
+            )
+
+            assertThat(
+                billingSource[item.id],
+                equalTo(null)
+            )
+        }
+    }
+
+    @Nested
     inner class GetStats {
         private fun assertResponse(request: Request, matcher: Matcher<BillingStats>) {
             val response = client(request)
