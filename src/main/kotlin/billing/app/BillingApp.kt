@@ -16,4 +16,6 @@ class BillingApp(
             newBillingItem.tag,
             newBillingItem.details
         ).also(billingSource::put)
+
+    fun getAllBillingItems() = billingSource.getAll()
 }

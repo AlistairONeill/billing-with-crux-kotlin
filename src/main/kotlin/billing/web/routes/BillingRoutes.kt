@@ -43,6 +43,7 @@ fun billingRoutes(
                 descriptionPath = API_DESCRIPTION_PATH
                 routes += pingRoute()
                 routes += addBillingItemRoute(billingApp)
+                routes += getBillingItemsRoute(billingApp)
             }
         )
     )

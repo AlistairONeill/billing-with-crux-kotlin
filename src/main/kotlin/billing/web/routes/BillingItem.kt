@@ -7,9 +7,12 @@ import billing.json.JNewBillingItem
 import billing.web.parseJsonBody
 import billing.web.routes.BillingRoutes.API_BILLING_ITEM
 import billing.web.toOkResponse
+import com.ubertob.kondor.json.JSet
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.meta
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -42,3 +45,14 @@ private val exampleNewBillingItem =
     ).let(JNewBillingItem::toJson)
 
 private val newBillingItemLens = httpBodyLens("The Billing Item to add", contentType = APPLICATION_JSON).toLens()
+
+fun getBillingItemsRoute(billingApp: BillingApp): ContractRoute =
+    API_BILLING_ITEM meta {
+        summary = "gets all billing items"
+        description = "gets all billing items"
+        produces += APPLICATION_JSON
+        returning(OK to "The billing items")
+    } bindContract GET to {
+        billingApp.getAllBillingItems()
+            .toOkResponse(JSet(JBillingItem))
+    }

@@ -2,6 +2,7 @@ package billing.web
 
 import billing.app.BillingApp
 import billing.domain.StubBillingSource
+import billing.domain.model.aBillingItem
 import billing.domain.model.aNewBillingItem
 import billing.domain.model.hasContentsOf
 import billing.json.JBillingItem
@@ -12,6 +13,7 @@ import billing.web.routes.billingRoutes
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.ubertob.kondor.json.JSet
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -84,5 +86,41 @@ class RoutesTest {
                 ),
                 hasStatus(BAD_REQUEST)
             )
+    }
+
+    @Nested
+    inner class GetBillingItems {
+        @Test
+        fun `can get an empty set of billing items`() {
+            val response = client(
+                Request(GET, API_BILLING_ITEM)
+            )
+
+            assertThat(
+                response,
+                hasStatus(OK)
+            )
+
+            assertThat(
+                response.parseJsonBody(JSet(JBillingItem)),
+                equalTo(emptySet())
+            )
+        }
+
+        @Test
+        fun `can get billing items`() {
+            val billingItems = List(3) { aBillingItem() }.toSet()
+
+            billingItems.forEach(billingSource::put)
+
+            val response = client(
+                Request(GET, API_BILLING_ITEM)
+            )
+
+            assertThat(
+                response.parseJsonBody(JSet(JBillingItem)),
+                equalTo(billingItems)
+            )
+        }
     }
 }
